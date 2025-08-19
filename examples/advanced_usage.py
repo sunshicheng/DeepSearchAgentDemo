@@ -6,8 +6,8 @@
 import os
 import sys
 
-# 添加src目录到Python路径
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+# 添加项目根目录到Python路径
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from src import DeepSearchAgent, Config
 from src.utils.config import print_config
