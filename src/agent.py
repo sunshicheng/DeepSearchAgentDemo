@@ -170,7 +170,8 @@ class DeepSearchAgent:
         search_results = tavily_search(
             search_query,
             max_results=self.config.max_search_results,
-            timeout=self.config.search_timeout
+            timeout=self.config.search_timeout,
+            api_key=self.config.tavily_api_key
         )
         
         if search_results:
@@ -227,7 +228,8 @@ class DeepSearchAgent:
             search_results = tavily_search(
                 search_query,
                 max_results=self.config.max_search_results,
-                timeout=self.config.search_timeout
+                timeout=self.config.search_timeout,
+                api_key=self.config.tavily_api_key
             )
             
             if search_results:

@@ -33,9 +33,9 @@ def main():
         # API密钥配置
         st.subheader("API密钥")
         deepseek_key = st.text_input("DeepSeek API Key", type="password", 
-                                   value=os.getenv("DEEPSEEK_API_KEY", ""))
+                                   value="")
         tavily_key = st.text_input("Tavily API Key", type="password",
-                                 value=os.getenv("TAVILY_API_KEY", ""))
+                                 value="")
         
         # 高级配置
         st.subheader("高级配置")
@@ -51,7 +51,7 @@ def main():
         else:
             model_name = st.selectbox("OpenAI模型", ["gpt-4o-mini", "gpt-4o"])
             openai_key = st.text_input("OpenAI API Key", type="password",
-                                     value=os.getenv("OPENAI_API_KEY", ""))
+                                     value="")
     
     # 主界面
     col1, col2 = st.columns([2, 1])

@@ -75,28 +75,31 @@ pip install -r requirements.txt
 
 ### 4. 配置API密钥
 
-复制配置文件模板：
+项目根目录下已有`config.py`配置文件，请直接编辑此文件设置您的API密钥：
 
-```bash
-cp config.env.example config.env
-```
+```python
+# Deep Search Agent 配置文件
+# 请在这里填入您的API密钥
 
-编辑`config.env`文件，设置您的API密钥：
+# DeepSeek API Key
+DEEPSEEK_API_KEY = "your_deepseek_api_key_here"
 
-```env
-# DeepSeek API Key（推荐）
-DEEPSEEK_API_KEY=your_deepseek_api_key_here
+# OpenAI API Key (可选)
+OPENAI_API_KEY = "your_openai_api_key_here"
 
-# Tavily搜索API Key（必需）
-TAVILY_API_KEY=your_tavily_api_key_here
-
-# OpenAI API Key（可选）
-OPENAI_API_KEY=your_openai_api_key_here
+# Tavily搜索API Key
+TAVILY_API_KEY = "your_tavily_api_key_here"
 
 # 配置参数
-MAX_REFLECTIONS=2
-SEARCH_RESULTS_PER_QUERY=3
-SEARCH_CONTENT_MAX_LENGTH=20000
+DEFAULT_LLM_PROVIDER = "deepseek"
+DEEPSEEK_MODEL = "deepseek-chat"
+OPENAI_MODEL = "gpt-4o-mini"
+
+MAX_REFLECTIONS = 2
+SEARCH_RESULTS_PER_QUERY = 3
+SEARCH_CONTENT_MAX_LENGTH = 20000
+OUTPUT_DIR = "reports"
+SAVE_INTERMEDIATE_STATES = True
 ```
 
 ### 5. 开始使用
@@ -105,7 +108,33 @@ SEARCH_CONTENT_MAX_LENGTH=20000
 
 ## 使用方法
 
-### 基本使用
+### 方式一：运行示例脚本
+
+**基本使用示例**：
+```bash
+python examples/basic_usage.py
+```
+这个示例展示了最简单的使用方式，执行一个预设的研究查询并显示结果。
+
+**高级使用示例**：
+```bash
+python examples/advanced_usage.py
+```
+这个示例展示了更复杂的使用场景，包括：
+- 自定义配置参数
+- 执行多个研究任务
+- 状态管理和恢复
+- 不同模型的使用
+
+### 方式二：Web界面
+
+启动Streamlit Web界面：
+```bash
+streamlit run examples/streamlit_app.py
+```
+Web界面无需配置文件，直接在界面中输入API密钥即可使用。
+
+### 方式三：编程方式
 
 ```python
 from src import DeepSearchAgent, load_config
@@ -123,7 +152,9 @@ final_report = agent.research(query, save_report=True)
 print(final_report)
 ```
 
-### 自定义配置
+### 方式四：自定义配置（编程方式）
+
+如果需要在代码中动态设置配置，可以使用以下方式：
 
 ```python
 from src import DeepSearchAgent, Config
@@ -143,8 +174,6 @@ config.tavily_api_key = "your_tavily_key"
 
 agent = DeepSearchAgent(config)
 ```
-
-
 
 ## 项目结构
 
@@ -177,7 +206,7 @@ Demo DeepSearch Agent/
 │   └── streamlit_app.py         # Web界面
 ├── reports/                      # 输出报告目录
 ├── requirements.txt              # 依赖列表
-├── config.env.example           # 配置文件模板
+├── config.py                    # 配置文件
 └── README.md                    # 项目文档
 ```
 
@@ -396,21 +425,6 @@ config = Config(
 )
 ```
 
-### Web界面
-
-启动Streamlit Web界面：
-
-```bash
-streamlit run examples/streamlit_app.py
-```
-
-界面提供：
-- 实时进度跟踪
-- 动态配置调整
-- 报告下载功能
-- 搜索历史查看
-- 状态文件管理
-
 ## 常见问题
 
 ### Q: 支持哪些LLM？
@@ -426,6 +440,8 @@ A:
 - **DeepSeek**: 访问 [DeepSeek平台](https://platform.deepseek.com/) 注册获取
 - **Tavily**: 访问 [Tavily](https://tavily.com/) 注册获取（每月1000次免费）
 - **OpenAI**: 访问 [OpenAI平台](https://platform.openai.com/) 获取
+
+获取密钥后，直接编辑项目根目录的`config.py`文件填入即可。
 
 ### Q: 研究报告质量如何提升？
 

@@ -32,7 +32,6 @@ venv.bak/
 
 # 环境变量文件
 .env
-config.env
 *.env
 
 # IDE

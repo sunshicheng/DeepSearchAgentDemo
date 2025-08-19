@@ -99,7 +99,7 @@ def get_tavily_client() -> TavilySearch:
 
 
 def tavily_search(query: str, max_results: int = 5, include_raw_content: bool = True, 
-                  timeout: int = 240) -> List[Dict[str, Any]]:
+                  timeout: int = 240, api_key: Optional[str] = None) -> List[Dict[str, Any]]:
     """
     便捷的Tavily搜索函数
     
@@ -108,12 +108,19 @@ def tavily_search(query: str, max_results: int = 5, include_raw_content: bool = 
         max_results: 最大结果数量
         include_raw_content: 是否包含原始内容
         timeout: 超时时间（秒）
+        api_key: Tavily API密钥，如果提供则使用此密钥，否则使用全局客户端
         
     Returns:
         搜索结果字典列表，保持与原始经验贴兼容的格式
     """
     try:
-        client = get_tavily_client()
+        if api_key:
+            # 使用提供的API密钥创建临时客户端
+            client = TavilySearch(api_key)
+        else:
+            # 使用全局客户端
+            client = get_tavily_client()
+        
         results = client.search(query, max_results, include_raw_content, timeout)
         
         # 转换为字典格式以保持兼容性
