@@ -143,7 +143,7 @@ Web界面无需配置文件，直接在界面中输入API密钥即可使用。
 ### 方式三：编程方式
 
 ```python
-from src import DeepSearchAgent, load_config
+from deep_research import DeepSearchAgent, load_config
 
 # 加载配置
 config = load_config()
@@ -163,15 +163,15 @@ print(final_report)
 如果需要在代码中动态设置配置，可以使用以下方式：
 
 ```python
-from src import DeepSearchAgent, Config
+from deep_research import DeepSearchAgent, Config
 
 # 自定义配置
 config = Config(
     default_llm_provider="deepseek",
     deepseek_model="deepseek-chat",
-    max_reflections=3,           # 增加反思次数
-    max_search_results=5,        # 增加搜索结果数
-    output_dir="my_reports"      # 自定义输出目录
+    max_reflections=3,  # 增加反思次数
+    max_search_results=5,  # 增加搜索结果数
+    output_dir="my_reports"  # 自定义输出目录
 )
 
 # 设置API密钥
@@ -366,7 +366,7 @@ class Config:
 ### 示例1：基本研究
 
 ```python
-from src import create_agent
+from deep_research import create_agent
 
 # 快速创建Agent
 agent = create_agent()
@@ -379,12 +379,12 @@ print(report)
 ### 示例2：自定义研究参数
 
 ```python
-from src import DeepSearchAgent, Config
+from deep_research import DeepSearchAgent, Config
 
 config = Config(
-    max_reflections=4,        # 更深度的反思
-    max_search_results=8,     # 更多搜索结果
-    max_paragraphs=6          # 更长的报告
+    max_reflections=4,  # 更深度的反思
+    max_search_results=8,  # 更多搜索结果
+    max_paragraphs=6  # 更长的报告
 )
 
 agent = DeepSearchAgent(config)

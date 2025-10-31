@@ -113,12 +113,12 @@ def get_logger(level='info'):
     trace_id = (str(int(time.time())) + str(uuid4())).replace('-', '')[:32]
 
     # 确定日志路径
-    base_dir = Path(__file__).parent.parent
+    base_dir = Path(__file__).parent.parent.parent
     log_dir = base_dir / 'logs'
     log_dir.mkdir(exist_ok=True)  # 创建日志目录（如果不存在）
 
     # 日志文件名
-    log_file = log_dir / f'deep_reach.log'
+    log_file = log_dir / f'deep_research.log'
 
     # 日志输出格式
     log_format = {

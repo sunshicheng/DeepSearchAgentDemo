@@ -9,8 +9,8 @@ import sys
 # 添加项目根目录到Python路径
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from src import DeepSearchAgent, Config
-from src.utils.config import print_config
+from deep_research import DeepSearchAgent, Config
+from deep_research.utils.config import print_config
 
 
 def advanced_example():

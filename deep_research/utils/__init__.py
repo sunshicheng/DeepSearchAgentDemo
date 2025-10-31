@@ -13,6 +13,7 @@ from .text_processing import (
 )
 
 from .config import Config, load_config
+from .logger import logger
 
 __all__ = [
     "clean_json_tags",
@@ -22,5 +23,6 @@ __all__ = [
     "update_state_with_search_results",
     "format_search_results_for_prompt",
     "Config",
-    "load_config"
+    "load_config",
+    "logger",
 ]
