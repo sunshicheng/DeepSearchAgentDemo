@@ -6,9 +6,9 @@
 import json
 from typing import List, Dict, Any
 
-from .base_node import BaseNode
-from ..prompts import SYSTEM_PROMPT_REPORT_FORMATTING
-from ..utils.text_processing import (
+from deep_research.nodes.base_node import BaseNode
+from deep_research.prompts import SYSTEM_PROMPT_REPORT_FORMATTING
+from deep_research.utils.text_processing import (
     remove_reasoning_from_output,
     clean_markdown_tags
 )

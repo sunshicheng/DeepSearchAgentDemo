@@ -7,8 +7,8 @@ import os
 from datetime import datetime
 from typing import Optional, Dict, Any
 
-from .llms import DeepSeekLLM, OpenAILLM, BaseLLM
-from .nodes import (
+from deep_research.llms import DeepSeekLLM, OpenAILLM, BaseLLM
+from deep_research.nodes import (
     ReportStructureNode,
     FirstSearchNode,
     ReflectionNode,
@@ -16,9 +16,9 @@ from .nodes import (
     ReflectionSummaryNode,
     ReportFormattingNode
 )
-from .state import State
-from .tools import tavily_search
-from .utils import Config, load_config, format_search_results_for_prompt
+from deep_research.state import State
+from deep_research.tools import tavily_search
+from deep_research.utils import Config, load_config, format_search_results_for_prompt, logger
 
 
 class DeepSearchAgent:
@@ -46,8 +46,8 @@ class DeepSearchAgent:
         # 确保输出目录存在
         os.makedirs(self.config.output_dir, exist_ok=True)
 
-        print(f"Deep Search Agent 已初始化")
-        print(f"使用LLM: {self.llm_client.get_model_info()}")
+        logger.info(f"Deep Search Agent 已初始化")
+        logger.info(f"使用LLM: {self.llm_client.get_model_info()}")
 
     def _initialize_llm(self) -> BaseLLM:
         """初始化LLM客户端"""
@@ -84,7 +84,7 @@ class DeepSearchAgent:
             最终报告内容
         """
         print(f"\n{'=' * 60}")
-        print(f"开始深度研究: {query}")
+        logger.info(f"开始深度研究: {query}")
         print(f"{'=' * 60}")
 
         try:
@@ -102,18 +102,18 @@ class DeepSearchAgent:
                 self._save_report(final_report)
 
             print(f"\n{'=' * 60}")
-            print("深度研究完成！")
+            logger.info(f"深度研究完成！{final_report}")
             print(f"{'=' * 60}")
 
             return final_report
 
         except Exception as e:
-            print(f"研究过程中发生错误: {str(e)}")
+            logger.error(f"研究过程中发生错误: {str(e)}")
             raise e
 
     def _generate_report_structure(self, query: str):
         """生成报告结构"""
-        print(f"\n[步骤 1] 生成报告结构...")
+        logger.info(f"\n[步骤 1] 生成报告结构...")
 
         # 创建报告结构节点
         report_structure_node = ReportStructureNode(self.llm_client, query)
@@ -121,16 +121,16 @@ class DeepSearchAgent:
         # 生成结构并更新状态
         self.state = report_structure_node.mutate_state(state=self.state)
 
-        print(f"报告结构已生成，共 {len(self.state.paragraphs)} 个段落:")
+        logger.info(f"报告结构已生成，共 {len(self.state.paragraphs)} 个段落:")
         for i, paragraph in enumerate(self.state.paragraphs, 1):
-            print(f"  {i}. {paragraph.title}")
+            logger.info(f"  {i}. {paragraph.title}")
 
     def _process_paragraphs(self):
         """处理所有段落"""
         total_paragraphs = len(self.state.paragraphs)
 
         for i in range(total_paragraphs):
-            print(f"\n[步骤 2.{i + 1}] 处理段落: {self.state.paragraphs[i].title}")
+            logger.info(f"\n[步骤 2.{i + 1}] 处理段落: {self.state.paragraphs[i].title}")
             print("-" * 50)
 
             # 初始搜索和总结
@@ -143,7 +143,7 @@ class DeepSearchAgent:
             self.state.paragraphs[i].research.mark_completed()
 
             progress = (i + 1) / total_paragraphs * 100
-            print(f"段落处理完成 ({progress:.1f}%)")
+            logger.info(f"段落处理完成 ({progress:.1f}%)")
 
     def _initial_search_and_summary(self, paragraph_index: int):
         """执行初始搜索和总结"""
@@ -156,16 +156,16 @@ class DeepSearchAgent:
         }
 
         # 生成搜索查询
-        print("  - 生成搜索查询...")
+        logger.info("_initial_search_and_summary - 生成搜索查询...")
         search_output = self.first_search_node.run(search_input)
         search_query = search_output["search_query"]
         reasoning = search_output["reasoning"]
 
-        print(f"  - 搜索查询: {search_query}")
-        print(f"  - 推理: {reasoning}")
+        logger.info(f"_initial_search_and_summary - 搜索查询: {search_query}")
+        logger.info(f"_initial_search_and_summary - 推理: {reasoning}")
 
         # 执行搜索
-        print("  - 执行网络搜索...")
+        logger.info("_initial_search_and_summary - 执行网络搜索...")
         search_results = tavily_search(
             search_query,
             max_results=self.config.max_search_results,
@@ -174,17 +174,17 @@ class DeepSearchAgent:
         )
 
         if search_results:
-            print(f"  - 找到 {len(search_results)} 个搜索结果")
+            logger.info(f"_initial_search_and_summary - 找到 {len(search_results)} 个搜索结果")
             for j, result in enumerate(search_results, 1):
-                print(f"    {j}. {result['title'][:50]}...")
+                logger.info(f"    {j}. {result['title']}")
         else:
-            print("  - 未找到搜索结果")
+            logger.error("  - 未找到搜索结果")
 
         # 更新状态中的搜索历史
         paragraph.research.add_search_results(search_query, search_results)
 
         # 生成初始总结
-        print("  - 生成初始总结...")
+        logger.info("_initial_search_and_summary - 生成初始总结...")
         summary_input = {
             "title": paragraph.title,
             "content": paragraph.content,
@@ -194,19 +194,21 @@ class DeepSearchAgent:
             )
         }
 
+        logger.info(f"_initial_search_and_summary - summary_input {summary_input}")
+
         # 更新状态
         self.state = self.first_summary_node.mutate_state(
             summary_input, self.state, paragraph_index
         )
 
-        print("  - 初始总结完成")
+        logger.info("_initial_search_and_summary- 初始总结完成")
 
     def _reflection_loop(self, paragraph_index: int):
         """执行反思循环"""
         paragraph = self.state.paragraphs[paragraph_index]
 
         for reflection_i in range(self.config.max_reflections):
-            print(f"  - 反思 {reflection_i + 1}/{self.config.max_reflections}...")
+            logger.info(f"_reflection_loop- 反思 {reflection_i + 1}/{self.config.max_reflections}...")
 
             # 准备反思输入
             reflection_input = {
@@ -220,8 +222,8 @@ class DeepSearchAgent:
             search_query = reflection_output["search_query"]
             reasoning = reflection_output["reasoning"]
 
-            print(f"    反思查询: {search_query}")
-            print(f"    反思推理: {reasoning}")
+            logger.info(f"_reflection_loop 反思查询: {search_query}")
+            logger.info(f"_reflection_loop 反思推理: {reasoning}")
 
             # 执行反思搜索
             search_results = tavily_search(
@@ -232,7 +234,7 @@ class DeepSearchAgent:
             )
 
             if search_results:
-                print(f"    找到 {len(search_results)} 个反思搜索结果")
+                logger.info(f"_reflection_loop 找到 {len(search_results)} 个反思搜索结果")
 
             # 更新搜索历史
             paragraph.research.add_search_results(search_query, search_results)
@@ -247,17 +249,18 @@ class DeepSearchAgent:
                 ),
                 "paragraph_latest_state": paragraph.research.latest_summary
             }
+            logger.info(f"_reflection_loop reflection_summary_input {reflection_summary_input}")
 
             # 更新状态
             self.state = self.reflection_summary_node.mutate_state(
                 reflection_summary_input, self.state, paragraph_index
             )
 
-            print(f"    反思 {reflection_i + 1} 完成")
+            logger.info(f"_reflection_loop 反思 {reflection_i + 1} 完成")
 
     def _generate_final_report(self) -> str:
         """生成最终报告"""
-        print(f"\n[步骤 3] 生成最终报告...")
+        logger.info(f"\n[步骤 3] 生成最终报告...")
 
         # 准备报告数据
         report_data = []
@@ -271,7 +274,7 @@ class DeepSearchAgent:
         try:
             final_report = self.report_formatting_node.run(report_data)
         except Exception as e:
-            print(f"LLM格式化失败，使用备用方法: {str(e)}")
+            logger.error(f"_generate_final_report LLM格式化失败，使用备用方法: {str(e)}")
             final_report = self.report_formatting_node.format_report_manually(
                 report_data, self.state.report_title
             )
@@ -280,7 +283,8 @@ class DeepSearchAgent:
         self.state.final_report = final_report
         self.state.mark_completed()
 
-        print("最终报告生成完成")
+        logger.info("_generate_final_report 最终报告生成完成")
+        logger.info(f"_generate_final_report 生成的最终报告\n {final_report}")
         return final_report
 
     def _save_report(self, report_content: str):
@@ -297,14 +301,14 @@ class DeepSearchAgent:
         with open(filepath, 'w', encoding='utf-8') as f:
             f.write(report_content)
 
-        print(f"报告已保存到: {filepath}")
+        logger.info(f"报告已保存到: {filepath}")
 
         # 保存状态（如果配置允许）
         if self.config.save_intermediate_states:
             state_filename = f"state_{query_safe}_{timestamp}.json"
             state_filepath = os.path.join(self.config.output_dir, state_filename)
             self.state.save_to_file(state_filepath)
-            print(f"状态已保存到: {state_filepath}")
+            logger.info(f"状态已保存到: {state_filepath}")
 
     def get_progress_summary(self) -> Dict[str, Any]:
         """获取进度摘要"""
@@ -313,12 +317,12 @@ class DeepSearchAgent:
     def load_state(self, filepath: str):
         """从文件加载状态"""
         self.state = State.load_from_file(filepath)
-        print(f"状态已从 {filepath} 加载")
+        logger.info(f"状态已从 {filepath} 加载")
 
     def save_state(self, filepath: str):
         """保存状态到文件"""
         self.state.save_to_file(filepath)
-        print(f"状态已保存到 {filepath}")
+        logger.info(f"状态已保存到 {filepath}")
 
 
 def create_agent(config_file: Optional[str] = None) -> DeepSearchAgent:

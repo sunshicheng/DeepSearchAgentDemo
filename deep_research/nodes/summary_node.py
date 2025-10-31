@@ -7,10 +7,10 @@ import json
 from typing import Any
 from json.decoder import JSONDecodeError
 
-from .base_node import StateMutationNode
-from ..state.state import State
-from ..prompts import SYSTEM_PROMPT_FIRST_SUMMARY, SYSTEM_PROMPT_REFLECTION_SUMMARY
-from ..utils.text_processing import (
+from deep_research.nodes.base_node import StateMutationNode
+from deep_research.state.state import State
+from deep_research.prompts import SYSTEM_PROMPT_FIRST_SUMMARY, SYSTEM_PROMPT_REFLECTION_SUMMARY
+from deep_research.utils.text_processing import (
     remove_reasoning_from_output,
     clean_json_tags
 )

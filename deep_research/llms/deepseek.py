@@ -6,7 +6,7 @@ DeepSeek LLM实现
 import os
 from typing import Optional, Dict, Any
 from openai import OpenAI
-from .base import BaseLLM
+from deep_research.llms.base import BaseLLM
 
 
 class DeepSeekLLM(BaseLLM):

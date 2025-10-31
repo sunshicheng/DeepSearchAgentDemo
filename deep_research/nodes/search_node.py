@@ -7,9 +7,9 @@ import json
 from typing import Dict, Any
 from json.decoder import JSONDecodeError
 
-from .base_node import BaseNode
-from ..prompts import SYSTEM_PROMPT_FIRST_SEARCH, SYSTEM_PROMPT_REFLECTION
-from ..utils.text_processing import (
+from deep_research.nodes.base_node import BaseNode
+from deep_research.prompts import SYSTEM_PROMPT_FIRST_SEARCH, SYSTEM_PROMPT_REFLECTION
+from deep_research.utils.text_processing import (
     remove_reasoning_from_output,
     clean_json_tags,
     extract_clean_response

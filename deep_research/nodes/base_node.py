@@ -5,8 +5,9 @@
 
 from abc import ABC, abstractmethod
 from typing import Any
-from ..llms.base import BaseLLM
-from ..state.state import State
+from deep_research.llms.base import BaseLLM
+from deep_research.state.state import State
+from deep_research.utils import logger
 
 
 class BaseNode(ABC):
@@ -63,11 +64,11 @@ class BaseNode(ABC):
 
     def log_info(self, message: str):
         """记录信息日志"""
-        print(f"[{self.node_name}] {message}")
+        logger.info(f"[{self.node_name}] {message}")
 
     def log_error(self, message: str):
         """记录错误日志"""
-        print(f"[{self.node_name}] 错误: {message}")
+        logger.error(f"[{self.node_name}] 错误: {message}")
 
 
 class StateMutationNode(BaseNode):
