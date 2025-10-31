@@ -11,7 +11,7 @@ from .base import BaseLLM
 
 class OpenAILLM(BaseLLM):
     """OpenAI LLM实现类"""
-    
+
     def __init__(self, api_key: Optional[str] = None, model_name: Optional[str] = None):
         """
         初始化OpenAI客户端
@@ -24,17 +24,17 @@ class OpenAILLM(BaseLLM):
             api_key = os.getenv("OPENAI_API_KEY")
             if not api_key:
                 raise ValueError("OpenAI API Key未找到！请设置OPENAI_API_KEY环境变量或在初始化时提供")
-        
+
         super().__init__(api_key, model_name)
-        
+
         # 初始化OpenAI客户端
         self.client = OpenAI(api_key=self.api_key)
         self.default_model = model_name or self.get_default_model()
-    
+
     def get_default_model(self) -> str:
         """获取默认模型名称"""
         return "gpt-4o-mini"
-    
+
     def invoke(self, system_prompt: str, user_prompt: str, **kwargs) -> str:
         """
         调用OpenAI API生成回复
@@ -53,7 +53,7 @@ class OpenAILLM(BaseLLM):
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
             ]
-            
+
             # 设置默认参数
             params = {
                 "model": self.default_model,
@@ -61,21 +61,21 @@ class OpenAILLM(BaseLLM):
                 "temperature": kwargs.get("temperature", 0.7),
                 "max_tokens": kwargs.get("max_tokens", 4000)
             }
-            
+
             # 调用API
             response = self.client.chat.completions.create(**params)
-            
+
             # 提取回复内容
             if response.choices and response.choices[0].message:
                 content = response.choices[0].message.content
                 return self.validate_response(content)
             else:
                 return ""
-                
+
         except Exception as e:
             print(f"OpenAI API调用错误: {str(e)}")
             raise e
-    
+
     def get_model_info(self) -> Dict[str, Any]:
         """
         获取当前模型信息

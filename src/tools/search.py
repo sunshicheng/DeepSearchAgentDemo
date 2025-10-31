@@ -16,7 +16,7 @@ class SearchResult:
     url: str
     content: str
     score: Optional[float] = None
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """转换为字典格式"""
         return {
@@ -29,7 +29,7 @@ class SearchResult:
 
 class TavilySearch:
     """Tavily搜索客户端封装"""
-    
+
     def __init__(self, api_key: Optional[str] = None):
         """
         初始化Tavily搜索客户端
@@ -41,10 +41,10 @@ class TavilySearch:
             api_key = os.getenv("TAVILY_API_KEY")
             if not api_key:
                 raise ValueError("Tavily API Key未找到！请设置TAVILY_API_KEY环境变量或在初始化时提供")
-        
+
         self.client = TavilyClient(api_key=api_key)
-    
-    def search(self, query: str, max_results: int = 5, include_raw_content: bool = True, 
+
+    def search(self, query: str, max_results: int = 5, include_raw_content: bool = True,
                timeout: int = 240) -> List[SearchResult]:
         """
         执行搜索
@@ -66,7 +66,7 @@ class TavilySearch:
                 include_raw_content=include_raw_content,
                 timeout=timeout
             )
-            
+
             # 解析结果
             results = []
             if 'results' in response:
@@ -78,9 +78,9 @@ class TavilySearch:
                         score=item.get('score')
                     )
                     results.append(result)
-            
+
             return results
-            
+
         except Exception as e:
             print(f"搜索错误: {str(e)}")
             return []
@@ -98,7 +98,7 @@ def get_tavily_client() -> TavilySearch:
     return _tavily_client
 
 
-def tavily_search(query: str, max_results: int = 5, include_raw_content: bool = True, 
+def tavily_search(query: str, max_results: int = 5, include_raw_content: bool = True,
                   timeout: int = 240, api_key: Optional[str] = None) -> List[Dict[str, Any]]:
     """
     便捷的Tavily搜索函数
@@ -120,12 +120,12 @@ def tavily_search(query: str, max_results: int = 5, include_raw_content: bool = 
         else:
             # 使用全局客户端
             client = get_tavily_client()
-        
+
         results = client.search(query, max_results, include_raw_content, timeout)
-        
+
         # 转换为字典格式以保持兼容性
         return [result.to_dict() for result in results]
-        
+
     except Exception as e:
         print(f"搜索功能调用错误: {str(e)}")
         return []
@@ -142,10 +142,10 @@ def test_search(query: str = "人工智能发展趋势 2025", max_results: int =
     print(f"\n=== 测试Tavily搜索功能 ===")
     print(f"搜索查询: {query}")
     print(f"最大结果数: {max_results}")
-    
+
     try:
         results = tavily_search(query, max_results=max_results)
-        
+
         if results:
             print(f"\n找到 {len(results)} 个结果:")
             for i, result in enumerate(results, 1):
@@ -157,7 +157,7 @@ def test_search(query: str = "人工智能发展趋势 2025", max_results: int =
                     print(f"相关度评分: {result['score']}")
         else:
             print("未找到搜索结果")
-            
+
     except Exception as e:
         print(f"搜索测试失败: {str(e)}")
 

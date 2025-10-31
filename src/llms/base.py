@@ -4,12 +4,12 @@ LLM基础抽象类
 """
 
 from abc import ABC, abstractmethod
-from typing import Optional, Dict, Any
+from typing import Optional
 
 
 class BaseLLM(ABC):
     """LLM基础抽象类"""
-    
+
     def __init__(self, api_key: str, model_name: Optional[str] = None):
         """
         初始化LLM客户端
@@ -20,7 +20,7 @@ class BaseLLM(ABC):
         """
         self.api_key = api_key
         self.model_name = model_name
-        
+
     @abstractmethod
     def invoke(self, system_prompt: str, user_prompt: str, **kwargs) -> str:
         """
@@ -35,7 +35,7 @@ class BaseLLM(ABC):
             LLM生成的回复文本
         """
         pass
-    
+
     @abstractmethod
     def get_default_model(self) -> str:
         """
@@ -45,7 +45,7 @@ class BaseLLM(ABC):
             默认模型名称
         """
         pass
-    
+
     def validate_response(self, response: str) -> str:
         """
         验证和清理响应内容

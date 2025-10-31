@@ -18,29 +18,29 @@ def basic_example():
     print("=" * 60)
     print("Deep Search Agent - 基本使用示例")
     print("=" * 60)
-    
+
     try:
         # 加载配置
         print("正在加载配置...")
         config = load_config()
         print_config(config)
-        
+
         # 创建Agent
         print("正在初始化Agent...")
         agent = DeepSearchAgent(config)
-        
+
         # 执行研究
         query = "2025年人工智能发展趋势"
         print(f"开始研究: {query}")
-        
+
         final_report = agent.research(query, save_report=True)
-        
+
         # 显示结果
         print("\n" + "=" * 60)
         print("研究完成！最终报告预览:")
         print("=" * 60)
         print(final_report[:500] + "..." if len(final_report) > 500 else final_report)
-        
+
         # 显示进度信息
         progress = agent.get_progress_summary()
         print(f"\n进度信息:")
@@ -48,7 +48,7 @@ def basic_example():
         print(f"- 已完成段落: {progress['completed_paragraphs']}")
         print(f"- 完成进度: {progress['progress_percentage']:.1f}%")
         print(f"- 是否完成: {progress['is_completed']}")
-        
+
     except Exception as e:
         print(f"示例运行失败: {str(e)}")
         print("请检查：")

@@ -13,7 +13,7 @@ __all__ = [
     "BaseNode",
     "ReportStructureNode",
     "FirstSearchNode",
-    "ReflectionNode", 
+    "ReflectionNode",
     "FirstSummaryNode",
     "ReflectionSummaryNode",
     "ReportFormattingNode"

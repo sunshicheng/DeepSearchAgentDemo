@@ -18,7 +18,7 @@ from ..utils.text_processing import (
 
 class FirstSearchNode(BaseNode):
     """为段落生成首次搜索查询的节点"""
-    
+
     def __init__(self, llm_client):
         """
         初始化首次搜索节点
@@ -27,7 +27,7 @@ class FirstSearchNode(BaseNode):
             llm_client: LLM客户端
         """
         super().__init__(llm_client, "FirstSearchNode")
-    
+
     def validate_input(self, input_data: Any) -> bool:
         """验证输入数据"""
         if isinstance(input_data, str):
@@ -39,7 +39,7 @@ class FirstSearchNode(BaseNode):
         elif isinstance(input_data, dict):
             return "title" in input_data and "content" in input_data
         return False
-    
+
     def run(self, input_data: Any, **kwargs) -> Dict[str, str]:
         """
         调用LLM生成搜索查询和理由
@@ -54,28 +54,28 @@ class FirstSearchNode(BaseNode):
         try:
             if not self.validate_input(input_data):
                 raise ValueError("输入数据格式错误，需要包含title和content字段")
-            
+
             # 准备输入数据
             if isinstance(input_data, str):
                 message = input_data
             else:
                 message = json.dumps(input_data, ensure_ascii=False)
-            
+
             self.log_info("正在生成首次搜索查询")
-            
+
             # 调用LLM
             response = self.llm_client.invoke(SYSTEM_PROMPT_FIRST_SEARCH, message)
-            
+
             # 处理响应
             processed_response = self.process_output(response)
-            
+
             self.log_info(f"生成搜索查询: {processed_response.get('search_query', 'N/A')}")
             return processed_response
-            
+
         except Exception as e:
             self.log_error(f"生成首次搜索查询失败: {str(e)}")
             raise e
-    
+
     def process_output(self, output: str) -> Dict[str, str]:
         """
         处理LLM输出，提取搜索查询和推理
@@ -90,7 +90,7 @@ class FirstSearchNode(BaseNode):
             # 清理响应文本
             cleaned_output = remove_reasoning_from_output(output)
             cleaned_output = clean_json_tags(cleaned_output)
-            
+
             # 解析JSON
             try:
                 result = json.loads(cleaned_output)
@@ -99,19 +99,19 @@ class FirstSearchNode(BaseNode):
                 result = extract_clean_response(cleaned_output)
                 if "error" in result:
                     raise ValueError("JSON解析失败")
-            
+
             # 验证和清理结果
             search_query = result.get("search_query", "")
             reasoning = result.get("reasoning", "")
-            
+
             if not search_query:
                 raise ValueError("未找到搜索查询")
-            
+
             return {
                 "search_query": search_query,
                 "reasoning": reasoning
             }
-            
+
         except Exception as e:
             self.log_error(f"处理输出失败: {str(e)}")
             # 返回默认查询
@@ -123,7 +123,7 @@ class FirstSearchNode(BaseNode):
 
 class ReflectionNode(BaseNode):
     """反思段落并生成新搜索查询的节点"""
-    
+
     def __init__(self, llm_client):
         """
         初始化反思节点
@@ -132,7 +132,7 @@ class ReflectionNode(BaseNode):
             llm_client: LLM客户端
         """
         super().__init__(llm_client, "ReflectionNode")
-    
+
     def validate_input(self, input_data: Any) -> bool:
         """验证输入数据"""
         if isinstance(input_data, str):
@@ -146,7 +146,7 @@ class ReflectionNode(BaseNode):
             required_fields = ["title", "content", "paragraph_latest_state"]
             return all(field in input_data for field in required_fields)
         return False
-    
+
     def run(self, input_data: Any, **kwargs) -> Dict[str, str]:
         """
         调用LLM反思并生成搜索查询
@@ -161,28 +161,28 @@ class ReflectionNode(BaseNode):
         try:
             if not self.validate_input(input_data):
                 raise ValueError("输入数据格式错误，需要包含title、content和paragraph_latest_state字段")
-            
+
             # 准备输入数据
             if isinstance(input_data, str):
                 message = input_data
             else:
                 message = json.dumps(input_data, ensure_ascii=False)
-            
+
             self.log_info("正在进行反思并生成新搜索查询")
-            
+
             # 调用LLM
             response = self.llm_client.invoke(SYSTEM_PROMPT_REFLECTION, message)
-            
+
             # 处理响应
             processed_response = self.process_output(response)
-            
+
             self.log_info(f"反思生成搜索查询: {processed_response.get('search_query', 'N/A')}")
             return processed_response
-            
+
         except Exception as e:
             self.log_error(f"反思生成搜索查询失败: {str(e)}")
             raise e
-    
+
     def process_output(self, output: str) -> Dict[str, str]:
         """
         处理LLM输出，提取搜索查询和推理
@@ -197,7 +197,7 @@ class ReflectionNode(BaseNode):
             # 清理响应文本
             cleaned_output = remove_reasoning_from_output(output)
             cleaned_output = clean_json_tags(cleaned_output)
-            
+
             # 解析JSON
             try:
                 result = json.loads(cleaned_output)
@@ -206,19 +206,19 @@ class ReflectionNode(BaseNode):
                 result = extract_clean_response(cleaned_output)
                 if "error" in result:
                     raise ValueError("JSON解析失败")
-            
+
             # 验证和清理结果
             search_query = result.get("search_query", "")
             reasoning = result.get("reasoning", "")
-            
+
             if not search_query:
                 raise ValueError("未找到搜索查询")
-            
+
             return {
                 "search_query": search_query,
                 "reasoning": reasoning
             }
-            
+
         except Exception as e:
             self.log_error(f"处理输出失败: {str(e)}")
             # 返回默认查询

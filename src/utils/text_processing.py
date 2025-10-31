@@ -23,7 +23,7 @@ def clean_json_tags(text: str) -> str:
     text = re.sub(r'```json\s*', '', text)
     text = re.sub(r'```\s*$', '', text)
     text = re.sub(r'```', '', text)
-    
+
     return text.strip()
 
 
@@ -41,7 +41,7 @@ def clean_markdown_tags(text: str) -> str:
     text = re.sub(r'```markdown\s*', '', text)
     text = re.sub(r'```\s*$', '', text)
     text = re.sub(r'```', '', text)
-    
+
     return text.strip()
 
 
@@ -58,13 +58,13 @@ def remove_reasoning_from_output(text: str) -> str:
     # 移除常见的推理标识
     patterns = [
         r'(?:reasoning|推理|思考|分析)[:：]\s*.*?(?=\{|\[)',  # 移除推理部分
-        r'(?:explanation|解释|说明)[:：]\s*.*?(?=\{|\[)',   # 移除解释部分
+        r'(?:explanation|解释|说明)[:：]\s*.*?(?=\{|\[)',  # 移除解释部分
         r'^.*?(?=\{|\[)',  # 移除JSON前的所有文本
     ]
-    
+
     for pattern in patterns:
         text = re.sub(pattern, '', text, flags=re.IGNORECASE | re.DOTALL)
-    
+
     return text.strip()
 
 
@@ -81,13 +81,13 @@ def extract_clean_response(text: str) -> Dict[str, Any]:
     # 清理文本
     cleaned_text = clean_json_tags(text)
     cleaned_text = remove_reasoning_from_output(cleaned_text)
-    
+
     # 尝试直接解析
     try:
         return json.loads(cleaned_text)
     except JSONDecodeError:
         pass
-    
+
     # 尝试查找JSON对象
     json_pattern = r'\{.*\}'
     match = re.search(json_pattern, cleaned_text, re.DOTALL)
@@ -96,7 +96,7 @@ def extract_clean_response(text: str) -> Dict[str, Any]:
             return json.loads(match.group())
         except JSONDecodeError:
             pass
-    
+
     # 尝试查找JSON数组
     array_pattern = r'\[.*\]'
     match = re.search(array_pattern, cleaned_text, re.DOTALL)
@@ -105,14 +105,14 @@ def extract_clean_response(text: str) -> Dict[str, Any]:
             return json.loads(match.group())
         except JSONDecodeError:
             pass
-    
+
     # 如果所有方法都失败，返回错误信息
     print(f"无法解析JSON响应: {cleaned_text[:200]}...")
     return {"error": "JSON解析失败", "raw_text": cleaned_text}
 
 
-def update_state_with_search_results(search_results: List[Dict[str, Any]], 
-                                   paragraph_index: int, state: Any) -> Any:
+def update_state_with_search_results(search_results: List[Dict[str, Any]],
+                                     paragraph_index: int, state: Any) -> Any:
     """
     将搜索结果更新到状态中
     
@@ -130,12 +130,12 @@ def update_state_with_search_results(search_results: List[Dict[str, Any]],
         if search_results:
             # 从搜索结果推断查询（这里需要改进以获取实际查询）
             current_query = "搜索查询"
-        
+
         # 添加搜索结果到状态
         state.paragraphs[paragraph_index].research.add_search_results(
             current_query, search_results
         )
-    
+
     return state
 
 
@@ -166,19 +166,19 @@ def truncate_content(content: str, max_length: int = 20000) -> str:
     """
     if len(content) <= max_length:
         return content
-    
+
     # 尝试在单词边界截断
     truncated = content[:max_length]
     last_space = truncated.rfind(' ')
-    
+
     if last_space > max_length * 0.8:  # 如果最后一个空格位置合理
         return truncated[:last_space] + "..."
     else:
         return truncated + "..."
 
 
-def format_search_results_for_prompt(search_results: List[Dict[str, Any]], 
-                                   max_length: int = 20000) -> List[str]:
+def format_search_results_for_prompt(search_results: List[Dict[str, Any]],
+                                     max_length: int = 20000) -> List[str]:
     """
     格式化搜索结果用于提示词
     
@@ -190,11 +190,11 @@ def format_search_results_for_prompt(search_results: List[Dict[str, Any]],
         格式化后的内容列表
     """
     formatted_results = []
-    
+
     for result in search_results:
         content = result.get('content', '')
         if content:
             truncated_content = truncate_content(content, max_length)
             formatted_results.append(truncated_content)
-    
+
     return formatted_results
